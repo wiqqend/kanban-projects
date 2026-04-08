@@ -18,3 +18,4 @@
 4. **Start working** on the kanban board and projects inside your house folder!
 5. Add collaborators to your forked repository. See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/inviting-collaborators-to-a-personal-repository
 6. YOU MUST SET UP YOUR FORKED REPOSITORY SO THAT AT LEAST ONE REVIEWER IS NEEDED BEFORE MERGING BRANCHES TO MASTER/MAIN. SEE: How to work on a Repo as a team: https://dev.to/gladyspascual/a-beginner-s-guide-to-using-git-when-working-with-a-team-for-the-first-time-1hba
+7. Check out: https://www.w3tutorials.net/blog/how-to-restrict-who-can-merge-to-master-on-a-github-repo/
