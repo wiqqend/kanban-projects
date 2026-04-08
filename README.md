@@ -1,7 +1,7 @@
 # kanban-projects
 ## Getting Started
 
-1. **Fork this repository** to your own GitHub account by clicking the "Fork" button in the top right corner.
+1. LEAD DEVELOPER: **Fork this repository** to your own GitHub account by clicking the "Fork" button in the top right corner.
 
 2. **Clone your fork** to your local machine:
     ```bash
@@ -16,3 +16,4 @@
     - **Slytherin** → `study-quest/`
 
 4. **Start working** on the kanban board and projects inside your house folder!
+5. Add collaborators to your forked repository. See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/inviting-collaborators-to-a-personal-repository
