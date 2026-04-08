@@ -155,7 +155,7 @@ function renderTakes() {
 // ── Form Submit ───────────────────────────────
 const takeForm = document.getElementById("take-form");
 takeForm.addEventListener("submit", (e) => {
-  // BUG #1: missing e.preventDefault() — page refreshes on submit
+  e.preventDefault();
   const author   = document.getElementById("author-input").value.trim();
   const text     = document.getElementById("take-input").value.trim();
   const category = document.getElementById("category-input").value;
