@@ -48,9 +48,10 @@ function sortTakes(list, sortBy) {
     return copy.sort((a, b) => b.date - a.date);
   }
   if (sortBy === "hottest") {
+    // BUG #4: sort is WRONG???
     return copy.sort(
       (a, b) =>
-        (b.votes.agree + b.votes.disagree) - (a.votes.agree + a.votes.disagree)
+        (a.votes.agree + a.votes.disagree) - (b.votes.agree + b.votes.disagree)
     );
   }
   if (sortBy === "controversial") {
@@ -88,7 +89,7 @@ function renderTakes() {
 
     // BUG #3: agreePct always = 50% when there are any agree votes
     const agreePct = total > 0
-      ? Math.round((take.votes.agree / (total)) * 100)
+      ? Math.round((take.votes.agree / (take.votes.agree + take.votes.agree)) * 100)
       : 0;
 
     const card = document.createElement("div");
@@ -108,7 +109,7 @@ function renderTakes() {
         </div>
         <div class="vote-counts">
           <span class="agree-label">✅ ${take.votes.agree} agree (${agreePct}%)</span>
-          <span class="disagree-label">${agreePct > 0 ? 100 - agreePct : 0}% disagree ${take.votes.disagree} ❌</span>
+          <span class="disagree-label">${100 - agreePct}% disagree ${take.votes.disagree} ❌</span>
         </div>
         <div class="vote-buttons">
           <button class="vote-btn agree-btn" data-id="${take.id}" data-vote="agree">
@@ -154,8 +155,8 @@ function renderTakes() {
 // ── Form Submit ───────────────────────────────
 const takeForm = document.getElementById("take-form");
 takeForm.addEventListener("submit", (e) => {
-  // BUG #1: missing e.preventDefault() — page refreshes on submit
-  e.preventDefault()
+  e.preventDefault();
+  
   const author   = document.getElementById("author-input").value.trim();
   const text     = document.getElementById("take-input").value.trim();
   const category = document.getElementById("category-input").value;
