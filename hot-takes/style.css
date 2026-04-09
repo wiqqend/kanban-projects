@@ -259,6 +259,7 @@ textarea {
   background: var(--green);
   border-radius: 3px;
   /* BUG: no width property — should be width: var(--agree-pct, 0%) */
+  width: var(--agree-pct, 0%);
   transition: width 0.3s ease;
 }
 
