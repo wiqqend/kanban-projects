@@ -133,6 +133,7 @@ function renderTakes() {
       <div class="card-top">
         <div class="card-meta">
           <span class="card-author">${take.author}</span>
+          <span class="card-date"><b>posted: ${new Date(take.date).toLocaleDateString()}</b></span>
           <span class="card-category">${categoryLabels[take.category] || take.category}</span>
         </div>
         <p class="card-take">${take.text}</p>
