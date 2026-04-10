@@ -5,7 +5,9 @@
 // ── Data ──────────────────────────────────────
 let takes = [];
 
-const SAVE_KEY = "hottakes_v1";
+const SAVE_KEY   = "hottakes_v1";
+const VOTED_KEY  = "hottakes_voted_v1"; // [FEAT-01] per-browser voted take IDs
+
 // ── Storage ───────────────────────────────────
 function saveTakes() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(takes));
@@ -13,10 +15,33 @@ function saveTakes() {
 
 function loadTakes() {
   // BUG #2: key has trouble reading the necessary info...
-  const stored = localStorage.getItem(SAVE_KEY);
+  const stored = localStorage.getItem("hot_takes_v1");
   if (stored) {
     takes = JSON.parse(stored);
   }
+}
+
+// [FEAT-01] Track which takes this browser has already voted on
+let votedTakes = new Set();
+
+function loadVoted() {
+  try {
+    const stored = localStorage.getItem(VOTED_KEY);
+    if (stored) votedTakes = new Set(JSON.parse(stored));
+  } catch { votedTakes = new Set(); }
+}
+
+function saveVoted() {
+  localStorage.setItem(VOTED_KEY, JSON.stringify([...votedTakes]));
+}
+
+function hasVoted(id) {
+  return votedTakes.has(id);
+}
+
+function markVoted(id) {
+  votedTakes.add(id);
+  saveVoted();
 }
 
 // ── Category Labels ───────────────────────────
@@ -92,6 +117,9 @@ function renderTakes() {
       ? Math.round((take.votes.agree / (total)) * 100)
       : 0;
 
+    // [FEAT-01] Check if this browser already voted on this take
+    const voted = hasVoted(take.id);
+
     const card = document.createElement("div");
     card.className = "take-card";
 
@@ -112,13 +140,14 @@ function renderTakes() {
           <span class="disagree-label">${agreePct > 0 ? 100 - agreePct : 0}% disagree ${take.votes.disagree} ❌</span>
         </div>
         <div class="vote-buttons">
-          <button class="vote-btn agree-btn" data-id="${take.id}" data-vote="agree">
+          <button class="vote-btn agree-btn" data-id="${take.id}" data-vote="agree" ${voted ? "disabled" : ""}>
             ✅ Agree
           </button>
-          <button class="vote-btn disagree-btn" data-id="${take.id}" data-vote="disagree">
+          <button class="vote-btn disagree-btn" data-id="${take.id}" data-vote="disagree" ${voted ? "disabled" : ""}>
             Disagree ❌
           </button>
         </div>
+        ${voted ? `<div class="you-voted-label">✔ You voted</div>` : ""}
       </div>
       <div class="card-footer">
         <button class="delete-btn" data-id="${take.id}">🗑️ Delete</button>
@@ -133,8 +162,11 @@ function renderTakes() {
     btn.addEventListener("click", () => {
       const take = takes.find(t => t.id === btn.dataset.id);
       if (!take) return;
+      // [FEAT-01] Ignore clicks if this browser already voted
+      if (hasVoted(take.id)) return;
       const voteType = btn.dataset.vote;
       take.votes[voteType]++;
+      markVoted(take.id); // [FEAT-01] persist the vote lock
       saveTakes();
       updateStats();
       renderTakes();
@@ -186,5 +218,6 @@ document.getElementById("sort-select").addEventListener("change", renderTakes);
 
 // ── Init ──────────────────────────────────────
 loadTakes();
+loadVoted(); // [FEAT-01] restore per-browser vote history
 updateStats();
 renderTakes();

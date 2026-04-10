@@ -309,6 +309,23 @@ textarea {
 
 .vote-btn.disagree-btn:hover { background: var(--red-dim); }
 
+/* [FEAT-01] Voted state — disable both buttons, show confirmation label */
+.vote-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.vote-btn:disabled:hover { background: none; }
+
+.you-voted-label {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0.3rem 0;
+  letter-spacing: 0.04em;
+}
+
 /* ── Card Footer ─────────────────────────────── */
 .card-footer {
   padding: 0.5rem 1rem;
