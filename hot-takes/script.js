@@ -6,7 +6,6 @@
 let takes = [];
 
 const SAVE_KEY = "hottakes_v1";
-
 // ── Storage ───────────────────────────────────
 function saveTakes() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(takes));
@@ -14,7 +13,7 @@ function saveTakes() {
 
 function loadTakes() {
   // BUG #2: key has trouble reading the necessary info...
-  const stored = localStorage.getItem("hot_takes_v1");
+  const stored = localStorage.getItem(SAVE_KEY);
   if (stored) {
     takes = JSON.parse(stored);
   }
