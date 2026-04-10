@@ -105,7 +105,13 @@ function renderTakes() {
   visible = sortTakes(visible, sortBy);
 
   if (visible.length === 0) {
-    grid.innerHTML = `<div class="empty-state">No takes here yet. Be the first to post! 🔥</div>`;
+    // [FEAT-02] Context-aware empty state:
+    //   • board is genuinely empty → invite the first post
+    //   • filter is active but nothing matches → name the category
+    const emptyMsg = takes.length === 0
+      ? "No takes yet — drop the first one! 🔥"
+      : `No ${categoryLabels[catFilter] ?? catFilter} takes posted yet.`;
+    grid.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
     return;
   }
 
