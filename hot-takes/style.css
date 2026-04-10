@@ -221,6 +221,11 @@ textarea {
   font-weight: 600;
   font-size: 0.85rem;
 }
+.card-date {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-left: 0.5rem;
+}
 
 .card-category {
   font-size: 0.72rem;
