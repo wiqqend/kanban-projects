@@ -138,7 +138,21 @@ input:focus, textarea:focus, select:focus {
 textarea {
   min-height: 90px;
   resize: vertical;
+  margin-bottom: 0.35rem;
+}
+
+/* ── Character Countdown (FEAT-03) ──────────── */
+.char-countdown {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: right;
   margin-bottom: 0.75rem;
+  transition: color 0.15s;
+}
+
+.char-countdown--warning {
+  color: var(--red);
+  font-weight: 600;
 }
 
 .btn-submit {
