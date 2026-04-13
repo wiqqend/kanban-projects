@@ -7,6 +7,9 @@ let takes = [];
 
 const SAVE_KEY   = "hottakes_v1";
 const VOTED_KEY  = "hottakes_voted_v1"; // [FEAT-01] per-browser voted take IDs
+const COPY_LABEL_RESET_MS = 2000;
+
+const copyTimers = new Map();
 
 // ── Storage ───────────────────────────────────
 function saveTakes() {
@@ -15,7 +18,7 @@ function saveTakes() {
 
 function loadTakes() {
   // BUG #2: key has trouble reading the necessary info...
-  const stored = localStorage.getItem("hot_takes_v1");
+  const stored = localStorage.getItem(SAVE_KEY);
   if (stored) {
     takes = JSON.parse(stored);
   }
@@ -42,6 +45,26 @@ function hasVoted(id) {
 function markVoted(id) {
   votedTakes.add(id);
   saveVoted();
+}
+
+function setCopyConfirmation(btn, takeId) {
+  const originalLabel = btn.dataset.originalLabel || btn.textContent;
+  btn.dataset.originalLabel = originalLabel;
+  btn.textContent = "Copied!";
+  btn.classList.add("is-copied");
+
+  const existingTimer = copyTimers.get(takeId);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+  }
+
+  const timerId = setTimeout(() => {
+    btn.classList.remove("is-copied");
+    btn.textContent = originalLabel;
+    copyTimers.delete(takeId);
+  }, COPY_LABEL_RESET_MS);
+
+  copyTimers.set(takeId, timerId);
 }
 
 // ── Category Labels ───────────────────────────
@@ -157,6 +180,7 @@ function renderTakes() {
         ${voted ? `<div class="you-voted-label">✔ You voted</div>` : ""}
       </div>
       <div class="card-footer">
+        <button class="copy-btn" data-id="${take.id}">Copy this take</button>
         <button class="delete-btn" data-id="${take.id}">🗑️ Delete</button>
       </div>
     `;
@@ -187,6 +211,51 @@ function renderTakes() {
       saveTakes();
       updateStats();
       renderTakes();
+    });
+  });
+
+  // Copy buttons
+  grid.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const take = takes.find(t => t.id === btn.dataset.id);
+      if (!take) return;
+
+      const totalVotes = take.votes.agree + take.votes.disagree;
+      const agreePct = totalVotes > 0
+        ? Math.round((take.votes.agree / totalVotes) * 100)
+        : 0;
+      const copyText = [
+        take.text,
+        `Author: ${take.author}`,
+        `Votes: ${take.votes.agree} agree, ${take.votes.disagree} disagree (${totalVotes} total, ${agreePct}% agree)`
+      ].join("\n");
+
+      let copied = false;
+
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(copyText);
+          copied = true;
+        } catch {
+          copied = false;
+        }
+      }
+
+      if (!copied) {
+        const temp = document.createElement("textarea");
+        temp.value = copyText;
+        temp.setAttribute("readonly", "");
+        temp.style.position = "absolute";
+        temp.style.left = "-9999px";
+        document.body.appendChild(temp);
+        temp.select();
+        copied = document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+
+      if (copied) {
+        setCopyConfirmation(btn, take.id);
+      }
     });
   });
 }
