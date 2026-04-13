@@ -4,6 +4,8 @@
 
 // ── Data ──────────────────────────────────────
 let takes = [];
+let mostVotedArray;
+let topVotes;
 
 const SAVE_KEY = "hottakes_v1";
 // ── Storage ───────────────────────────────────
@@ -38,6 +40,18 @@ function updateStats() {
   );
   document.getElementById("total-takes").textContent = totalTakes;
   document.getElementById("total-votes").textContent = totalVotes;
+
+  //calculate most spicy
+  mostVotedArray = sortTakes(takes, "hottest");
+  topVotes = Number(mostVotedArray[0].votes.agree) + Number(mostVotedArray[0].votes.disagree);
+  let endingIndex = 1;
+  for (let i = 1; i < mostVotedArray.length; i++) {
+    
+    let nextTopVotes = Number(mostVotedArray[i].votes.agree) + Number(mostVotedArray[i].votes.disagree);
+    if (topVotes === nextTopVotes) endingIndex++;
+  }
+  mostVotedArray = mostVotedArray.slice(0, endingIndex);
+  console.log(mostVotedArray);
 }
 
 // ── Sorting ───────────────────────────────────
@@ -70,6 +84,7 @@ function renderTakes() {
   const grid        = document.getElementById("takes-grid");
   const catFilter   = document.getElementById("filter-category").value;
   const sortBy      = document.getElementById("sort-select").value;
+  const hotBadge = "🌶️ Most Spicy";
 
   grid.innerHTML = "";
 
@@ -101,6 +116,9 @@ function renderTakes() {
 
     card.innerHTML = `
       <div class="card-top">
+        <div class="card-badges">
+          <span ${!mostVotedArray.includes(take) ? "hidden" : ""} class="hot-badge">${hotBadge}</span>
+        </div>
         <div class="card-meta">
           <span class="card-author">${take.author}</span>
           <span class="card-category">${categoryLabels[take.category] || take.category}</span>
