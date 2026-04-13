@@ -4,6 +4,8 @@
 
 // ── Data ──────────────────────────────────────
 let takes = [];
+let mostVotedArray;
+let topVotes;
 
 const SAVE_KEY   = "hottakes_v1";
 const VOTED_KEY  = "hottakes_voted_v1"; // [FEAT-01] per-browser voted take IDs
@@ -86,6 +88,18 @@ function updateStats() {
   );
   document.getElementById("total-takes").textContent = totalTakes;
   document.getElementById("total-votes").textContent = totalVotes;
+
+  //calculate most spicy
+  mostVotedArray = sortTakes(takes, "hottest");
+  topVotes = Number(mostVotedArray[0].votes.agree) + Number(mostVotedArray[0].votes.disagree);
+  let endingIndex = 1;
+  for (let i = 1; i < mostVotedArray.length; i++) {
+    
+    let nextTopVotes = Number(mostVotedArray[i].votes.agree) + Number(mostVotedArray[i].votes.disagree);
+    if (topVotes === nextTopVotes) endingIndex++;
+  }
+  mostVotedArray = mostVotedArray.slice(0, endingIndex);
+  console.log(mostVotedArray);
 }
 
 // ── Sorting ───────────────────────────────────
@@ -118,6 +132,7 @@ function renderTakes() {
   const grid        = document.getElementById("takes-grid");
   const catFilter   = document.getElementById("filter-category").value;
   const sortBy      = document.getElementById("sort-select").value;
+  const hotBadge = "🌶️ Most Spicy";
 
   grid.innerHTML = "";
 
@@ -145,6 +160,10 @@ function renderTakes() {
     const agreePct = total > 0
       ? Math.round((take.votes.agree / (total)) * 100)
       : 0;
+    
+    const disagreePct = total > 0
+      ? Math.round((take.votes.disagree / (total)) * 100)
+      : 0; 
 
     // [FEAT-01] Check if this browser already voted on this take
     const voted = hasVoted(take.id);
@@ -154,6 +173,9 @@ function renderTakes() {
 
     card.innerHTML = `
       <div class="card-top">
+        <div class="card-badges">
+          <span ${!mostVotedArray.includes(take) ? "hidden" : ""} class="hot-badge">${hotBadge}</span>
+        </div>
         <div class="card-meta">
           <span class="card-author">${take.author}</span>
           <span class="card-date"><b>posted: ${new Date(take.date).toLocaleDateString()}</b></span>
@@ -167,7 +189,7 @@ function renderTakes() {
         </div>
         <div class="vote-counts">
           <span class="agree-label">✅ ${take.votes.agree} agree (${agreePct}%)</span>
-          <span class="disagree-label">${agreePct > 0 ? 100 - agreePct : 0}% disagree ${take.votes.disagree} ❌</span>
+          <span class="disagree-label">${disagreePct}% disagree ${take.votes.disagree} ❌</span>
         </div>
         <div class="vote-buttons">
           <button class="vote-btn agree-btn" data-id="${take.id}" data-vote="agree" ${voted ? "disabled" : ""}>
