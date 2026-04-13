@@ -191,6 +191,19 @@ function renderTakes() {
   });
 }
 
+// ── Character Countdown (FEAT-03) ─────────────
+const takeInput     = document.getElementById("take-input");
+const charCountdown = document.getElementById("char-countdown");
+const MAX_CHARS     = 200;
+
+function updateCharCountdown() {
+  const remaining = MAX_CHARS - takeInput.value.length;
+  charCountdown.textContent = `${takeInput.value.length} / ${MAX_CHARS} characters`;
+  charCountdown.classList.toggle("char-countdown--warning", remaining < 25);
+}
+
+takeInput.addEventListener("input", updateCharCountdown);
+
 // ── Form Submit ───────────────────────────────
 const takeForm = document.getElementById("take-form");
 takeForm.addEventListener("submit", (e) => {
@@ -217,6 +230,7 @@ takeForm.addEventListener("submit", (e) => {
 
   document.getElementById("author-input").value = "";
   document.getElementById("take-input").value   = "";
+  updateCharCountdown();
 });
 
 // ── Filter & Sort ─────────────────────────────
