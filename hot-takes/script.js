@@ -187,6 +187,7 @@ function renderTakes() {
       saveTakes();
       updateStats();
       renderTakes();
+      updateLeaderBoard();
     });
   });
 }
@@ -227,12 +228,49 @@ takeForm.addEventListener("submit", (e) => {
   saveTakes();
   updateStats();
   renderTakes();
+  updateLeaderBoard();
 
   document.getElementById("author-input").value = "";
   document.getElementById("take-input").value   = "";
   updateCharCountdown();
 });
+function updateLeaderBoard(){
+  const list = document.getElementById("leaderboard-list");
 
+  //Count takes per author  + total votes
+  const authorStats = {};
+
+  takes.forEach(t=> {
+    if(!authorStats[t.author]) {
+      authorStats[t.author] = {
+        count: 0,
+        votes: 0
+      };
+    }
+    authorStats[t.author].count++;
+    authorStats[t.author].votes += t.votes.agree + t.votes.disagree;
+  });
+
+  //convert to array and sort
+  const sorted = Object.entries(authorStats)
+  .map(([author, data]) => ({
+  author,
+  count: data.count,
+  votes: data.votes
+  }))
+  .sort((a,b) => {
+    if (b.count !== a.count) return b.count - a.count;
+    return b.votes - a.votes;
+  })
+  .slice(0,3);
+  list.innerHTML = "";
+
+  sorted.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.author} - ${item.count} takes`;
+    list.appendChild(li);
+  });
+}
 // ── Filter & Sort ─────────────────────────────
 document.getElementById("filter-category").addEventListener("change", renderTakes);
 document.getElementById("sort-select").addEventListener("change", renderTakes);
@@ -242,3 +280,4 @@ loadTakes();
 loadVoted(); // [FEAT-01] restore per-browser vote history
 updateStats();
 renderTakes();
+updateLeaderBoard();
