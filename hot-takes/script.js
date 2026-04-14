@@ -76,17 +76,8 @@ const categoryLabels = {
   music:  "🎵 Music",
   sports: "🏆 Sports",
   school: "📚 School",
-  life:   "✨ Life"
+  life:   "✨ Life",
 };
-
-const categoryColors = {
-  food:   "red",
-  movies: "purple",
-  music:  "black",
-  sports: "orange",
-  school: "yellow",
-  life:   "green"
-}
 
 // ── Stats ─────────────────────────────────────
 function updateStats() {
@@ -100,6 +91,7 @@ function updateStats() {
 
   //calculate most spicy
   mostVotedArray = sortTakes(takes, "hottest");
+  if(!mostVotedArray[0]) return;
   topVotes = Number(mostVotedArray[0].votes.agree) + Number(mostVotedArray[0].votes.disagree);
   let endingIndex = 1;
   for (let i = 1; i < mostVotedArray.length; i++) {
@@ -181,7 +173,6 @@ function renderTakes() {
     card.className = "take-card";
 
     card.innerHTML = `
-    <div style="border-color: ${categoryColors[take.category]}>
       <div class="card-top">
         <div class="card-badges">
           <span ${!mostVotedArray.includes(take) ? "hidden" : ""} class="hot-badge">${hotBadge}</span>
@@ -214,7 +205,6 @@ function renderTakes() {
       <div class="card-footer">
         <button class="copy-btn" data-id="${take.id}">Copy this take</button>
         <button class="delete-btn" data-id="${take.id}">🗑️ Delete</button>
-      </div>
       </div>
     `;
 
