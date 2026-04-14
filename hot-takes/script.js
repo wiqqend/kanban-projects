@@ -79,6 +79,15 @@ const categoryLabels = {
   life:   "✨ Life",
 };
 
+const categoryColor = {
+  food:   "red",
+  movies: "yellow",
+  music:  "orange",
+  sports: "green",
+  school: "blue",
+  life:   "purple",
+}
+
 // ── Stats ─────────────────────────────────────
 function updateStats() {
   const totalTakes = takes.length;
@@ -91,6 +100,7 @@ function updateStats() {
 
   //calculate most spicy
   mostVotedArray = sortTakes(takes, "hottest");
+  if(!mostVotedArray[0]) return;
   topVotes = Number(mostVotedArray[0].votes.agree) + Number(mostVotedArray[0].votes.disagree);
   let endingIndex = 1;
   for (let i = 1; i < mostVotedArray.length; i++) {
@@ -99,7 +109,6 @@ function updateStats() {
     if (topVotes === nextTopVotes) endingIndex++;
   }
   mostVotedArray = mostVotedArray.slice(0, endingIndex);
-  console.log(mostVotedArray);
 }
 
 // ── Sorting ───────────────────────────────────
@@ -172,6 +181,7 @@ function renderTakes() {
     card.className = "take-card";
 
     card.innerHTML = `
+      <div style="border: 2px solid ${categoryColor[take.category]};">
       <div class="card-top">
         <div class="card-badges">
           <span ${!mostVotedArray.includes(take) ? "hidden" : ""} class="hot-badge">${hotBadge}</span>
@@ -234,6 +244,51 @@ function renderTakes() {
       updateStats();
       renderTakes();
       updateLeaderBoard();
+    });
+  });
+
+  // Copy buttons
+  grid.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const take = takes.find(t => t.id === btn.dataset.id);
+      if (!take) return;
+
+      const totalVotes = take.votes.agree + take.votes.disagree;
+      const agreePct = totalVotes > 0
+        ? Math.round((take.votes.agree / totalVotes) * 100)
+        : 0;
+      const copyText = [
+        take.text,
+        `Author: ${take.author}`,
+        `Votes: ${take.votes.agree} agree, ${take.votes.disagree} disagree (${totalVotes} total, ${agreePct}% agree)`
+      ].join("\n");
+
+      let copied = false;
+
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(copyText);
+          copied = true;
+        } catch {
+          copied = false;
+        }
+      }
+
+      if (!copied) {
+        const temp = document.createElement("textarea");
+        temp.value = copyText;
+        temp.setAttribute("readonly", "");
+        temp.style.position = "absolute";
+        temp.style.left = "-9999px";
+        document.body.appendChild(temp);
+        temp.select();
+        copied = document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+
+      if (copied) {
+        setCopyConfirmation(btn, take.id);
+      }
     });
   });
 
